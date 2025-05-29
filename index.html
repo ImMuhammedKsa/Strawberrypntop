@@ -2,11 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>strawberryONTOP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+      opacity: 0;
+      animation: fadeIn 1.2s ease-in-out forwards;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+
+    a.button {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: #5865f2;
+      padding: 0.9rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    a.button:hover {
+      background-color: #4752c4;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      a.button {
+        font-size: 1rem;
+        padding: 0.8rem 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <h1>Welcome!</h1>
-  <p>dm strawberry “send me the message now”</p>
+  <a href="https://discord.com/users/1146860504141283421" class="button" target="_blank">
+    dm strawberry “send me the message now”
+  </a>
 
   <script>
     fetch('/.netlify/functions/log-ip')
