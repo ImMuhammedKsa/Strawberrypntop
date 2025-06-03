@@ -7,29 +7,32 @@ exports.handler = async (event) => {
     event.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
     "Unknown IP";
 
-  const userAgent = event.headers["user-agent"] || "Unknown";
+  const userAgent = event.headers["user-agent"] || "Unknown UA";
   const timestamp = new Date().toISOString();
 
+  // Improved OS detection
   const detectOS = (ua) => {
-    if (/Windows/i.test(ua)) return "Windows";
-    if (/Mac OS X/i.test(ua)) return "macOS";
-    if (/iPhone|iPad/i.test(ua)) return "iOS";
-    if (/Android/i.test(ua)) return "Android";
-    if (/Linux/i.test(ua)) return "Linux";
+    const l = ua.toLowerCase();
+    if (l.includes("ipad") || (l.includes("macintosh") && l.includes("mobile"))) return "iPadOS";
+    if (l.includes("iphone")) return "iOS";
+    if (l.includes("android")) return "Android";
+    if (l.includes("windows")) return "Windows";
+    if (l.includes("mac os x") || l.includes("macintosh")) return "macOS";
+    if (l.includes("linux")) return "Linux";
     return "Unknown";
   };
 
+  // Simple browser detection
   const detectBrowser = (ua) => {
-    if (/Chrome/i.test(ua)) return "Chrome";
-    if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) return "Safari";
-    if (/Firefox/i.test(ua)) return "Firefox";
-    if (/Edge/i.test(ua)) return "Edge";
-    if (/CriOS/i.test(ua)) return "Chrome (iOS)";
+    const l = ua.toLowerCase();
+    if (l.includes("edg/")) return "Edge";
+    if (l.includes("chrome") && !l.includes("edg/") && !l.includes("opr/")) return "Chrome";
+    if (l.includes("safari") && !l.includes("chrome")) return "Safari";
+    if (l.includes("firefox")) return "Firefox";
+    if (l.includes("opr/") || l.includes("opera")) return "Opera";
+    if (l.includes("msie") || l.includes("trident")) return "Internet Explorer";
     return "Unknown";
   };
-
-  const os = detectOS(userAgent);
-  const browser = detectBrowser(userAgent);
 
   try {
     const geoRes = await fetch(`http://ipwho.is/${ip}`);
@@ -40,35 +43,42 @@ exports.handler = async (event) => {
       region = "N/A",
       city = "N/A",
       isp = "N/A",
-      proxy = false
+      proxy = false,
+      vpn = false,
     } = geoData;
+
+    // VPN/Proxy flag = true if either proxy or vpn is true
+    const vpnProxy = proxy || vpn;
+
+    const os = detectOS(userAgent);
+    const browser = detectBrowser(userAgent);
 
     const message = {
       content: `New Visitor Logged
-**IP**: ${ip}
-**Location**: ${city}, ${region}, ${country}
-**ISP**: ${isp}
-**VPN/Proxy**: ${proxy}
-**OS**: ${os}
-**Browser**: ${browser}
-**Time**: ${timestamp}`
+IP: ${ip}
+Location: ${city}, ${region}, ${country}
+ISP: ${isp}
+OS: ${os}
+Browser: ${browser}
+VPN/Proxy: ${vpnProxy}
+Time: ${timestamp}`
     };
 
     await fetch(webhookURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(message)
+      body: JSON.stringify(message),
     });
 
     return {
       statusCode: 200,
-      body: "Logged successfully"
+      body: "Logged successfully",
     };
   } catch (err) {
     console.error("Error:", err);
     return {
       statusCode: 500,
-      body: "Failed to send data"
+      body: "Failed to send data",
     };
   }
 };
