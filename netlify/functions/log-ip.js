@@ -1,5 +1,3 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
 exports.handler = async (event) => {
   const webhookURL = "https://discord.com/api/webhooks/1379270305272299530/EdXC7ENWy6IzQiR1-ETKyeyitOmG_It2088qG3SROttMnLqzvp6YV879Wqs-WwIYa4yk";
 
@@ -12,7 +10,6 @@ exports.handler = async (event) => {
   const userAgent = event.headers["user-agent"] || "Unknown";
   const timestamp = new Date().toISOString();
 
-  // Basic OS & Browser detection
   const detectOS = (ua) => {
     if (/Windows/i.test(ua)) return "Windows";
     if (/Mac OS X/i.test(ua)) return "macOS";
