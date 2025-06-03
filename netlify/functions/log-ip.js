@@ -23,11 +23,11 @@ exports.handler = async (event) => {
 
     const message = {
       content: `New Visitor Logged
-IP: ${ip}
-Location: ${city}, ${region}, ${country}
+**IP**: ${ip}
+**Location**: ${city}, ${region}, ${country}
 ISP: ${isp}
-User Agent: ${userAgent}
-Time: ${timestamp}`
+**User Agent**: ${userAgent}
+**Time**: ${timestamp}`
     };
 
     await fetch(webhookURL, {
