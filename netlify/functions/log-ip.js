@@ -57,7 +57,7 @@ exports.handler = async (event) => {
       content: `New Visitor Logged
 **IP**: ${ip}
 **Location**: ${city}, ${region}, ${country}
-**ISP**: ${ispDomain}
+**ISP**: ${connectiondomain}
 **OS**: ${os}
 **Browser**: ${browser}
 **VPN/Proxy**: ${vpnProxy}
