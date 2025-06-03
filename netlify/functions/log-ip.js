@@ -42,10 +42,12 @@ exports.handler = async (event) => {
       country = "N/A",
       region = "N/A",
       city = "N/A",
-      isp = "N/A",
       proxy = false,
       vpn = false,
+      connection = {}
     } = geoData;
+
+    const ispDomain = connection.domain || "N/A";
 
     // VPN/Proxy flag = true if either proxy or vpn is true
     const vpnProxy = proxy || vpn;
@@ -57,7 +59,7 @@ exports.handler = async (event) => {
       content: `New Visitor Logged
 **IP**: ${ip}
 **Location**: ${city}, ${region}, ${country}
-**ISP**: ${connectiondomain}
+**ISP**: ${ispDomain}
 **OS**: ${os}
 **Browser**: ${browser}
 **VPN/Proxy**: ${vpnProxy}
