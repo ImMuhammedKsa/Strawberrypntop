@@ -1,5 +1,5 @@
 exports.handler = async (event) => {
-  const webhookURL = "https://discord.com/api/webhooks/1379270305272299530/EdXC7ENWy6IzQiR1-ETKyeyitOmG_It2088qG3SROttMnLqzvp6YV879Wqs-WwIYa4yk";
+  const webhookURL = "https://discord.com/api/webhooks/1379270308183277699/_5D3vGdAchQxJAsJXqlKlUPYv8g7Y7WW-9DQHd0Vp5vrcd6y6AZ_1_flpL5ZIuVl6ZTR";
   const proxyCheckKey = "953802-7ll18a-88031m-g5gz09";
 
   const ip =
